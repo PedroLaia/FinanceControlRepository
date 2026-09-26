@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="Core/Core.csproj" />
-  <Project Path="Data/Data.csproj" />
-  <Project Path="Desktop/Desktop.csproj" />
+  <Project Path="Core/FinanceControlCore.csproj" />
+  <Project Path="Data/FinanceControlData.csproj" />
+  <Project Path="Desktop/FinanceControlDesktop.csproj" />
 </Solution>
