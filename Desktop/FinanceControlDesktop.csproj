@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Core\FinanceControlCore.csproj" />
+    <ProjectReference Include="..\Data\FinanceControlData.csproj" />
   </ItemGroup>
 
 </Project>
