@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace Desktop
+namespace FinanceControlDesktop
 {
     /// <summary>
     /// Interaction logic for App.xaml
