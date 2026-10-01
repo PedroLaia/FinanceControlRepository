@@ -3,33 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FinanceControlDesktop"
+        xmlns:local="clr-namespace:FinanceControlDesktop" 
+        xmlns:view="clr-namespace:FinanceControlDesktop.Views"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
-            <TextBox Width="250"
-                 Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Content="Adicionar"
-                Command="{Binding AdicionarCommand}"
-                Margin="8,0,0,0" Padding="12,4"/>
-        </StackPanel>
+    <view:CategoriaView/>
 
-        <ListBox Grid.Row="1"
-         ItemsSource="{Binding Categorias}"
-         SelectedItem="{Binding CategoriaSelecionada}"
-         DisplayMemberPath="Nome"/>
 
-        <Button Grid.Row="2"
-        Content="Remover selecionada"
-        Command="{Binding RemoverCommand}"
-        HorizontalAlignment="Right"
-        Margin="0,12,0,0" Padding="12,4"/>
-    </Grid>
 </Window>
