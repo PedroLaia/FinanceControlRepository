@@ -1,4 +1,5 @@
 ﻿using FinanceControlData;
+using FinanceControlData.Repositories;
 using FinanceControlDesktop.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
