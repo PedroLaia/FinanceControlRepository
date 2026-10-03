@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinanceControlData
+namespace FinanceControlData.Repositories
 {
     public interface ICategoriaRepository
     {

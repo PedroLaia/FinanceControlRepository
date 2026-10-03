@@ -1,5 +1,5 @@
 ﻿using FinanceControlCore.Entities;
-using FinanceControlData;
+using FinanceControlData.Repositories;
 using FinanceControlDesktop.Commands;
 using System;
 using System.Collections.Generic;
