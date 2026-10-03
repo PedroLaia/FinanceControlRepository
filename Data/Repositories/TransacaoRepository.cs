@@ -1,5 +1,6 @@
 ﻿using FinanceControlCore.Entities;
 using FinanceControlCore.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace FinanceControlData.Repositories
 
         public List<Transacao> ObterTodas()
         {
-            List<Transacao> transacoes = _dbcontext.Transacoes.ToList();
+            List<Transacao> transacoes = _dbcontext.Transacoes.Include(t=> t.Categoria).ToList();
             return transacoes;
 
         }

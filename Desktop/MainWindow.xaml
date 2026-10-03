@@ -8,7 +8,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
-    <view:CategoriaView/>
-
-
+    <TabControl SelectionChanged="TabControl_SelectionChanged">
+        <TabItem Header="Categorias">
+            <view:CategoriaView DataContext="{Binding CategoriaVM}"/>
+        </TabItem>
+        <TabItem Header="Transações">
+            <view:TransacaoView DataContext="{Binding TransacaoVM}"/>
+        </TabItem>
+    </TabControl>
 </Window>

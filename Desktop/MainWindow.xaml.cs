@@ -26,9 +26,26 @@ namespace FinanceControlDesktop
             var context = new FinanceDbContext();
             context.Database.Migrate();
 
-            var repositorio = new CategoriaRepository(context);
-            var viewModel = new CategoriaViewModel(repositorio);
-            DataContext = viewModel;
+            var categoriaRepository = new CategoriaRepository(context);
+            var transacaoRepository = new TransacaoRepository(context);
+
+            var categoriaVM = new CategoriaViewModel(categoriaRepository);
+            var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository);
+
+            var mainVM = new MainViewModel(categoriaVM, transacaoVM);
+
+            DataContext = mainVM;
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source is TabControl)
+            {
+                if (DataContext is MainViewModel main)
+                {
+                    main.TransacaoVM.CarregarCategorias();
+                }
+            }
         }
     }
 }
