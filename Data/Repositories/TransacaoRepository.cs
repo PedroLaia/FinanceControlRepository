@@ -34,7 +34,7 @@ namespace FinanceControlData.Repositories
         public List<Transacao> ObterPorFiltro(DateTime? inicio, DateTime? fim, TipoTransacao? tipo, int? categoriaId)
         {
             List<Transacao> transacoes;
-            IQueryable<Transacao> consulta = _dbcontext.Transacoes;
+            IQueryable<Transacao> consulta = _dbcontext.Transacoes.Include(t=> t.Categoria);
             if (categoriaId != null)
             {
                 consulta = consulta.Where(t => t.CategoriaId == categoriaId);

@@ -15,5 +15,8 @@
         <TabItem Header="Transações">
             <view:TransacaoView DataContext="{Binding TransacaoVM}"/>
         </TabItem>
+        <TabItem Header="Histórico">
+            <view:HistoricoView DataContext="{Binding HistoricoVM}"/>
+        </TabItem>
     </TabControl>
 </Window>
