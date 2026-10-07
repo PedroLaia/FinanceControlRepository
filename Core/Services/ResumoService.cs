@@ -40,5 +40,15 @@ namespace FinanceControlCore.Services
                     g => g.Sum(c=> c.Valor));
         }
 
+        public Dictionary<string, decimal> SaldoPorCategoria(IEnumerable<Transacao> transacoes)
+        {
+            return transacoes
+                .GroupBy(c => c.Categoria.Nome)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Where(c => c.Tipo == TipoTransacao.Entrada).Sum(v => v.Valor) - g.Where(a => a.Tipo == TipoTransacao.Saida).Sum(v => v.Valor));
+                
+        }
+
     }
 }

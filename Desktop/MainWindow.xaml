@@ -18,5 +18,8 @@
         <TabItem Header="Histórico">
             <view:HistoricoView DataContext="{Binding HistoricoVM}"/>
         </TabItem>
+        <TabItem Header="Resumo">
+            <view:ResumoView DataContext="{Binding ResumoVM}"/>
+        </TabItem>
     </TabControl>
 </Window>
