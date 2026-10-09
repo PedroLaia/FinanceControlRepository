@@ -1,20 +1,22 @@
-﻿<UserControl x:Class="FinanceControlDesktop.Views.HistoricoView"
+<UserControl x:Class="FinanceControlDesktop.Views.HistoricoView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>   <!-- Row 0: painel de filtros -->
+            <RowDefinition Height="*"/>      <!-- Row 1: lista de resultados -->
         </Grid.RowDefinitions>
 
+        <!-- Painel de filtros -->
         <StackPanel Grid.Row="0">
             <TextBlock Text="Filtros" Margin="0,0,0,6"/>
 
+            <!-- Período: data início e data fim lado a lado -->
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -31,6 +33,7 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Tipo + Categoria + botão Filtrar (3ª coluna Auto = largura do botão) -->
             <Grid Margin="0,0,0,14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -47,10 +50,12 @@
                     <TextBlock Text="Categoria"/>
                     <ComboBox ItemsSource="{Binding Categorias}" SelectedItem="{Binding CategoriaFiltro}" DisplayMemberPath="Nome" Margin="0,2,0,0"/>
                 </StackPanel>
+                <!-- Aplica os filtros chamando ObterPorFiltro na VM -->
                 <Button Grid.Column="4" Content="Filtrar" Command="{Binding FiltrarCommand}" Padding="16,6" VerticalAlignment="Bottom"/>
             </Grid>
         </StackPanel>
 
+        <!-- Lista de resultados filtrados (mesmo layout de linha da tela de Transações) -->
         <ListBox Grid.Row="1" ItemsSource="{Binding Transacoes}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
