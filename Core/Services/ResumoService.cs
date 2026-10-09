@@ -26,7 +26,7 @@ namespace FinanceControlCore.Services
         }
         public decimal CalcularSaldo(IEnumerable<Transacao> transacoes)
         {
-            var totalEntradas = TotalEntradas (transacoes);
+            var totalEntradas = TotalEntradas(transacoes);
             var totalSaidas = TotalSaidas(transacoes);
             return totalEntradas - totalSaidas;
         }
@@ -37,8 +37,36 @@ namespace FinanceControlCore.Services
                 .GroupBy(c => c.Categoria.Nome)
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Sum(c=> c.Valor));
+                    g => g.Sum(c => c.Valor));
         }
 
+        public Dictionary<string, decimal> SaldoPorCategoria(IEnumerable<Transacao> transacoes)
+        {
+            return transacoes
+                .GroupBy(c => c.Categoria.Nome)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Where(c => c.Tipo == TipoTransacao.Entrada).Sum(v => v.Valor) - g.Where(a => a.Tipo == TipoTransacao.Saida).Sum(v => v.Valor));
+
+        }
+
+        public Dictionary<string, decimal> EntradasPorCategoria(IEnumerable<Transacao> transacoes)
+        {
+            return transacoes
+                .GroupBy(c => c.Categoria.Nome)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Where(c => c.Tipo == TipoTransacao.Entrada).Sum(v => v.Valor));
+        }
+
+
+        public Dictionary<string, decimal> SaidasPorCategoria(IEnumerable<Transacao> transacoes)
+        {
+            return transacoes
+                .GroupBy(c => c.Categoria.Nome)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Where(c => c.Tipo == TipoTransacao.Saida).Sum(v => v.Valor));
+        }
     }
 }
