@@ -30,11 +30,26 @@
      SelectedItem="{Binding CategoriaSelecionada}"
      DisplayMemberPath="Nome"/>   <!-- mostra a propriedade Nome de cada objeto Categoria -->
 
-        <!-- Remove a categoria selecionada na lista -->
-        <Button Grid.Row="2"
-    Content="Remover selecionada"
-    Command="{Binding RemoverCommand}"
-    HorizontalAlignment="Right"
-    Margin="0,12,0,0" Padding="12,4"/>
+        <!-- Row 2: mensagem de bloqueio (esquerda) + botão remover (direita) -->
+        <Grid Grid.Row="2" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Aviso quando a categoria está em uso (vem do MensagemExcluir da VM) -->
+            <TextBlock Grid.Column="0"
+                       Text="{Binding MensagemExcluir}"
+                       Foreground="Red"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,0"/>
+
+            <!-- Remove a categoria selecionada na lista -->
+            <Button Grid.Column="1"
+                    Content="Remover selecionada"
+                    Command="{Binding RemoverCommand}"
+                    Padding="12,4"/>
+        </Grid>
     </Grid>
 </UserControl>

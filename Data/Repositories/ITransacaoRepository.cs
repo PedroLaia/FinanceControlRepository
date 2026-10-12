@@ -22,6 +22,8 @@ namespace FinanceControlData.Repositories
 
         List<Transacao> ObterPorFiltro(DateTime? inicio, DateTime? fim, TipoTransacao? tipo, int? categoriaId);
 
+        bool ExisteCategoria(int categoriaId);
+
 
 
     }

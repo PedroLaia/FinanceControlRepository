@@ -29,7 +29,7 @@ namespace FinanceControlDesktop
             var categoriaRepository = new CategoriaRepository(context);
             var transacaoRepository = new TransacaoRepository(context);
 
-            var categoriaVM = new CategoriaViewModel(categoriaRepository);
+            var categoriaVM = new CategoriaViewModel(categoriaRepository, transacaoRepository);
             var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository);
             var historicoVM = new HistoricoViewModel(transacaoRepository, categoriaRepository);
             var resumoVM = new ResumoViewModel(transacaoRepository);
