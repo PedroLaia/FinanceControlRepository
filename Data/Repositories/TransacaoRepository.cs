@@ -34,7 +34,7 @@ namespace FinanceControlData.Repositories
         public List<Transacao> ObterPorFiltro(DateTime? inicio, DateTime? fim, TipoTransacao? tipo, int? categoriaId)
         {
             List<Transacao> transacoes;
-            IQueryable<Transacao> consulta = _dbcontext.Transacoes.Include(t=> t.Categoria);
+            IQueryable<Transacao> consulta = _dbcontext.Transacoes.Include(t => t.Categoria);
             if (categoriaId != null)
             {
                 consulta = consulta.Where(t => t.CategoriaId == categoriaId);
@@ -46,7 +46,7 @@ namespace FinanceControlData.Repositories
             if (inicio != null)
             {
                 consulta = consulta.Where(t => t.Data >= inicio);
-                
+
             }
             if (fim != null)
             {
@@ -71,7 +71,7 @@ namespace FinanceControlData.Repositories
 
         public List<Transacao> ObterTodas()
         {
-            List<Transacao> transacoes = _dbcontext.Transacoes.Include(t=> t.Categoria).ToList();
+            List<Transacao> transacoes = _dbcontext.Transacoes.Include(t => t.Categoria).ToList();
             return transacoes;
 
         }
@@ -87,6 +87,11 @@ namespace FinanceControlData.Repositories
             _dbcontext.Transacoes.Remove(transacao);
             _dbcontext.SaveChanges();
 
+        }
+
+        public bool ExisteCategoria(int categoriaId)
+        {
+            return _dbcontext.Transacoes.Any(c=> c.CategoriaId == categoriaId);
         }
     }
 }
