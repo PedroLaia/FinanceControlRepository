@@ -38,7 +38,7 @@ namespace FinanceControlDesktop.ViewModels
             _categoriaRepository = categoria;
             _transacaoRepository = transacao;
             Categorias = new ObservableCollection<Categoria>(_categoriaRepository.ObterTodas());
-            AdicionarCommand = new RelayCommand(Adicionar);
+            AdicionarCommand = new RelayCommand(Adicionar, PodeAdicionar);
             RemoverCommand = new RelayCommand(Remover, PodeRemover);
 
         }
@@ -71,6 +71,11 @@ namespace FinanceControlDesktop.ViewModels
         public bool PodeRemover()
         {
             return CategoriaSelecionada != null;
+        }
+
+        public bool PodeAdicionar()
+        {
+            return !string.IsNullOrWhiteSpace(Nome);
         }
     }
 }
