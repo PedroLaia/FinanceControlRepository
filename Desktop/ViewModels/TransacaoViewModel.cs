@@ -39,7 +39,7 @@ namespace FinanceControlDesktop.ViewModels
         public TipoTransacao TipoSelecionado { get => _tipoSelecionado; set { _tipoSelecionado = value; OnPropertyChanged(); } }
 
         private Categoria? _categoriaSelecionada;
-        public Categoria? CategoriaSelecionada { get => _categoriaSelecionada; set { _categoriaSelecionada = value; OnPropertyChanged(); } }
+        public Categoria? CategoriaSelecionada { get => _categoriaSelecionada; set { _categoriaSelecionada = value;MensagemErro = string.Empty; OnPropertyChanged(); } }
 
         private string _mensagemErro = string.Empty;
         public string MensagemErro { get => _mensagemErro; set { _mensagemErro = value; OnPropertyChanged(); } }

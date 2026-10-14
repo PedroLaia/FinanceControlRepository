@@ -45,6 +45,7 @@ namespace FinanceControlDesktop
                 if (DataContext is MainViewModel main)
                 {
                     main.TransacaoVM.CarregarCategorias();
+                    main.HistoricoVM.CarregarCategorias();
                     main.ResumoVM.CalcularResumo();
                 }
             }

@@ -1,9 +1,14 @@
-# Finance Control
+<p align="center">
+  <img src="docs/logo.png" alt="Finance Control" width="130">
+</p>
+
+<h1 align="center">Finance Control</h1>
 
 Sistema de gestão financeira pessoal (aplicação desktop), desenvolvido como
 projeto de estudo em C# / .NET com foco em boas práticas de arquitetura.
 
-> 🚧 **Status:** Em desenvolvimento — Etapa 1 de 6 (aplicação desktop).
+> ✅ **Etapa 1 concluída** — aplicação desktop (WPF + MVVM + EF Core/SQLite).
+> 🚧 Projeto em evolução (6 etapas no total).
 
 ## Sobre
 
@@ -56,9 +61,21 @@ git clone https://github.com/PedroLaia/FinanceControlRepository.git
 3. Execute (F5). O banco SQLite é criado automaticamente na primeira execução
    (via migrations).
 
+### Rodar o executável (sem Visual Studio)
+
+Para apenas usar o aplicativo, gere o executável self-contained (não exige .NET instalado):
+
+```bash
+dotnet publish Desktop/FinanceControlDesktop.csproj -c Release -r win-x64 --self-contained true
+```
+
+O pacote fica em `Desktop/bin/Release/net8.0-windows/win-x64/publish/`.
+Execute o `FinanceControlDesktop.exe` — o banco de dados é criado automaticamente na
+primeira execução.
+
 ## Roadmap
 
-1. **Etapa 1** — Desktop (WPF + MVVM + SQLite) 🚧
+1. **Etapa 1** — Desktop (WPF + MVVM + SQLite) ✅
 2. Etapa 2 — Persistência consolidada + UI amigável
 3. Etapa 3 — Relatórios, gráficos e metas
 4. Etapa 4 — Backend / API (ASP.NET Core)
