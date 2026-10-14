@@ -27,7 +27,7 @@ namespace FinanceControlDesktop.ViewModels
         public string Nome { get => _nome; set { _nome = value; OnPropertyChanged(); } }
 
         private Categoria? _categoriaSelecionada;
-        public Categoria? CategoriaSelecionada { get => _categoriaSelecionada; set { _categoriaSelecionada = value; OnPropertyChanged(); } }
+        public Categoria? CategoriaSelecionada { get => _categoriaSelecionada; set { _categoriaSelecionada = value;MensagemExcluir = string.Empty; OnPropertyChanged(); } }
 
         private string _mensagemExcluir = string.Empty;
         public string MensagemExcluir { get => _mensagemExcluir; set { _mensagemExcluir = value;OnPropertyChanged(); } }
@@ -65,6 +65,7 @@ namespace FinanceControlDesktop.ViewModels
             }
             _categoriaRepository.Remover(CategoriaSelecionada.Id);
             Categorias.Remove(CategoriaSelecionada);
+            MensagemExcluir = string.Empty;
 
         }
 

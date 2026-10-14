@@ -56,5 +56,14 @@ namespace FinanceControlDesktop.ViewModels
                 Transacoes.Add(transacao);
             }
         }
+
+        public void CarregarCategorias()
+        {
+            Categorias.Clear();
+            foreach (var categoria in _categoriaRepository.ObterTodas())
+            {
+                Categorias.Add(categoria);
+            }
+        }
     }
 }

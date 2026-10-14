@@ -6,11 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\finance-control.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\FinanceControlCore.csproj" />
     <ProjectReference Include="..\Data\FinanceControlData.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\finance-control.ico" />
   </ItemGroup>
 
 </Project>
