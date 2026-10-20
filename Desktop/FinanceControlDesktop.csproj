@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\FinanceControlCore.csproj" />
     <ProjectReference Include="..\Data\FinanceControlData.csproj" />
   </ItemGroup>
