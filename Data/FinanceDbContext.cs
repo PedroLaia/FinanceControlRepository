@@ -17,7 +17,15 @@ namespace FinanceControlData
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=FinanceControlDB.db");
+                string pastaAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                string pastaApp = Path.Combine(pastaAppData, "FinanceControl");
+
+                Directory.CreateDirectory(pastaApp);
+
+                string caminhoDB = Path.Combine(pastaApp, "FinanceControlDB.db");
+
+                optionsBuilder.UseSqlite($"Data Source={caminhoDB}");
             }
         }
     }
