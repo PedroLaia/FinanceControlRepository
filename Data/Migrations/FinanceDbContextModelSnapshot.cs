@@ -66,7 +66,7 @@ namespace FinanceControlData.Migrations
                     b.HasOne("FinanceControlCore.Entities.Categoria", "Categoria")
                         .WithMany("Transacoes")
                         .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Categoria");

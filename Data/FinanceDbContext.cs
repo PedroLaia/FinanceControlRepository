@@ -28,5 +28,13 @@ namespace FinanceControlData
                 optionsBuilder.UseSqlite($"Data Source={caminhoDB}");
             }
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Transacao>()
+                .HasOne(t => t.Categoria)
+                .WithMany(c => c.Transacoes)
+                .HasForeignKey(t => t.CategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
