@@ -7,7 +7,6 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <!-- Converte bool -> Visibility (Visible/Collapsed). Nativo do WPF -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
@@ -18,7 +17,9 @@
             <RowDefinition Height="*"/>
             <!-- Row 1: lista -->
             <RowDefinition Height="Auto"/>
-            <!-- Row 2: painel de edição (só em modo edição) -->
+            <!-- Row 2: mensagem (sempre visível) -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 3: painel de edição (só em modo edição) -->
         </Grid.RowDefinitions>
 
         <!-- Nova categoria -->
@@ -30,7 +31,7 @@
                     Margin="8,0,0,0" Padding="12,4"/>
         </StackPanel>
 
-        <!-- Lista: cada item mostra o nome + botão Editar (só na linha selecionada) -->
+        <!-- Lista: na linha selecionada aparecem Editar + Remover -->
         <ListBox Grid.Row="1"
                  ItemsSource="{Binding Categorias}"
                  SelectedItem="{Binding CategoriaSelecionada}"
@@ -41,35 +42,41 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Nome}" VerticalAlignment="Center"/>
-                        <!-- Command sobe até a VM (RelativeSource); visível só se o item está selecionado -->
-                        <Button Grid.Column="1" Content="Editar" Padding="10,2"
+                        <!-- Editar: só na linha selecionada -->
+                        <Button Grid.Column="1" Content="Editar" Padding="10,2" Margin="0,0,6,0"
                                 Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource BoolToVis}}"/>
+                        <!-- Remover: ao lado do Editar, também só na linha selecionada -->
+                        <Button Grid.Column="2" Content="Remover" Padding="10,2"
+                                Command="{Binding DataContext.RemoverCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                 Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource BoolToVis}}"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Painel de edição: aparece só quando ModoEdicao = true -->
-        <StackPanel Grid.Row="2" Margin="0,12,0,0"
+        <!-- Mensagem de "categoria em uso" (sempre presente; vazia não ocupa nada) -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding MensagemExcluir}"
+                   Foreground="Red" TextWrapping="Wrap" Margin="0,8,0,0"/>
+
+        <!-- Painel de edição: só o nome + Salvar, aparece quando ModoEdicao = true -->
+        <StackPanel Grid.Row="3" Margin="0,12,0,0"
                     Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}">
             <TextBlock Text="Editar selecionada" Margin="0,0,0,6"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0"
                          Text="{Binding NomeEdicao, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="1" Content="Salvar"
                         Command="{Binding SalvarCommand}" Margin="8,0,0,0" Padding="12,4"/>
-                <Button Grid.Column="2" Content="Remover"
-                        Command="{Binding RemoverCommand}" Margin="8,0,0,0" Padding="12,4"/>
             </Grid>
-            <TextBlock Text="{Binding MensagemExcluir}" Foreground="Red" TextWrapping="Wrap" Margin="0,6,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

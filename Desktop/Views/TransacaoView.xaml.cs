@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +24,15 @@ namespace FinanceControlDesktop.Views
         public TransacaoView()
         {
             InitializeComponent();
+        }
+        private void Valor_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string textoFinal = textBox.Text
+                .Remove(textBox.SelectionStart, textBox.SelectionLength)
+                .Insert(textBox.SelectionStart, e.Text);
+
+            e.Handled = !Regex.IsMatch(textoFinal, @"^\d*([.,]\d{0,2})?$");
         }
     }
 }

@@ -6,37 +6,44 @@
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Row 0: formulário de cadastro -->
-            <RowDefinition Height="*"/>      <!-- Row 1: lista de transações -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 0: formulário -->
+            <RowDefinition Height="*"/>
+            <!-- Row 1: lista -->
         </Grid.RowDefinitions>
 
-        <!-- Formulário de nova transação (empilhado verticalmente) -->
         <StackPanel Grid.Row="0">
+
+            <!-- Faixa "Editando" (só em modo edição) -->
+            <TextBlock Text="Editando transação" FontWeight="SemiBold" Margin="0,0,0,8"
+                       Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
 
             <TextBlock Text="Descrição"/>
             <TextBox Text="{Binding Descricao, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,10"/>
 
-            <!-- Linha com Valor e Data lado a lado (2 colunas + espaçador no meio) -->
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="12"/>   <!-- espaçador entre as colunas -->
+                    <ColumnDefinition Width="12"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Valor"/>
-                    <TextBox Text="{Binding Valor}" Margin="0,2,0,0"/>
+                    <!-- PreviewTextInput: bloqueia digitar mais de 2 casas decimais -->
+                    <TextBox Text="{Binding Valor}" Margin="0,2,0,0" PreviewTextInput="Valor_PreviewTextInput"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Data"/>
-                    <!-- DatePicker: SelectedDate liga a data escolhida à VM -->
                     <DatePicker SelectedDate="{Binding Data}" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Linha com Tipo e Categoria lado a lado -->
             <Grid Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -45,36 +52,60 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Tipo"/>
-                    <!-- ItemsSource = enum (Entrada/Saida); SelectedItem = valor escolhido -->
                     <ComboBox ItemsSource="{Binding Tipos}" SelectedItem="{Binding TipoSelecionado}" Margin="0,2,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Categoria"/>
-                    <!-- Lista de objetos Categoria; DisplayMemberPath mostra o Nome -->
                     <ComboBox ItemsSource="{Binding Categorias}" SelectedItem="{Binding CategoriaSelecionada}" DisplayMemberPath="Nome" Margin="0,2,0,0"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Botão de cadastrar + mensagem de erro de validação ao lado -->
+            <!-- Botões: Adicionar (normal) ↔ Salvar/Cancelar (edição) -->
             <StackPanel Orientation="Horizontal">
-                <Button Content="Adicionar transação" Command="{Binding AdicionarCommand}" Padding="12,6"/>
+                <Button Content="Adicionar transação" Command="{Binding AdicionarCommand}" Padding="12,6">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ModoEdicao}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Content="Salvar edição" Command="{Binding SalvarCommand}" Padding="12,6"
+                        Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Cancelar" Command="{Binding CancelamentoCommand}" Padding="12,6" Margin="8,0,0,0"
+                        Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
+
                 <TextBlock Text="{Binding MensagemErro}" Foreground="Red" TextWrapping="Wrap" VerticalAlignment="Center" Margin="12,0,0,0"/>
             </StackPanel>
 
         </StackPanel>
 
-        <!-- Lista de transações; cada item é desenhado pelo DataTemplate abaixo -->
-        <ListBox Grid.Row="1" ItemsSource="{Binding Transacoes}" Margin="0,12,0,0">
+        <!-- Lista: SelectedItem -> TransacaoSelecionada; botão Editar só na linha selecionada -->
+        <ListBox Grid.Row="1" Margin="0,12,0,0"
+                 ItemsSource="{Binding Transacoes}"
+                 SelectedItem="{Binding TransacaoSelecionada}"
+                 HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <!-- Uma linha por transação: colunas com largura fixa pra alinhar -->
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90"/>
-                        <TextBlock Text="{Binding Tipo}" Width="70"/>
-                        <TextBlock Text="{Binding Descricao}" Width="160"/>
-                        <TextBlock Text="{Binding Categoria.Nome}" Width="120"/>   <!-- binding aninhado: Transacao.Categoria.Nome -->
-                        <TextBlock Text="{Binding Valor, StringFormat=C}"/>        <!-- C = formato moeda -->
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90"/>
+                            <TextBlock Text="{Binding Tipo}" Width="70"/>
+                            <TextBlock Text="{Binding Descricao}" Width="160"/>
+                            <TextBlock Text="{Binding Categoria.Nome}" Width="120"/>
+                            <TextBlock Text="{Binding Valor, StringFormat=C}"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="Editar" Padding="10,2"
+                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource BoolToVis}}"/>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
