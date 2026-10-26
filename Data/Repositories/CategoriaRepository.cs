@@ -32,6 +32,12 @@ namespace FinanceControlData.Repositories
             _dbcontext.SaveChanges();
         }
 
+        public void Atualizar(Categoria categoria)
+        {
+            _dbcontext.Categorias.Update(categoria);
+            _dbcontext.SaveChanges();
+        }
+
         public List<Categoria> ObterTodas()
         {
             List<Categoria> categorias = _dbcontext.Categorias.ToList();

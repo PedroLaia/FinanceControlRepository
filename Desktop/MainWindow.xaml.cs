@@ -49,6 +49,7 @@ namespace FinanceControlDesktop
                 {
                     main.TransacaoVM.CarregarCategorias();
                     main.HistoricoVM.CarregarCategorias();
+                    main.HistoricoVM.Filtrar();
                     main.ResumoVM.CalcularResumo();
                 }
             }

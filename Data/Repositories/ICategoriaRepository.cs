@@ -11,6 +11,7 @@ namespace FinanceControlData.Repositories
     {
         void Adicionar(Categoria categoria);
         void Remover(int id);
+        void Atualizar(Categoria categoria);
         List<Categoria> ObterTodas();
 
     }
