@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace FinanceControlDesktop.ViewModels
@@ -62,6 +63,31 @@ namespace FinanceControlDesktop.ViewModels
         private bool _modoEdicao = false;
         public bool ModoEdicao { get => _modoEdicao; set { _modoEdicao = value; OnPropertyChanged(); } }
 
+        
+        ////////////HISTORICO
+        
+        public ICommand FiltrarCommand { get; }
+        public ICommand AlternarFiltrosCommand { get; }
+        
+        public ICommand LimparFiltrosCommand { get; }
+
+        private DateTime? _dataInicio;
+        public DateTime? DataInicio { get => _dataInicio; set { _dataInicio = value; OnPropertyChanged(); } }
+
+        private DateTime? _dataFim;
+        public DateTime? DataFim { get => _dataFim; set { _dataFim = value; OnPropertyChanged(); } }
+
+        private TipoTransacao? _tipoFiltro;
+        public TipoTransacao? TipoFiltro { get => _tipoFiltro; set { _tipoFiltro = value; OnPropertyChanged(); } }
+
+        private Categoria? _categoriaFiltro;
+        public Categoria? CategoriaFiltro { get => _categoriaFiltro; set { _categoriaFiltro = value; OnPropertyChanged(); } }
+
+        private bool _filtrosVisiveis = false;
+        public bool FiltrosVisiveis { get => _filtrosVisiveis; set { _filtrosVisiveis = value; OnPropertyChanged(); } }
+
+        ////////////HISTORICO
+
 
 
         public TransacaoViewModel(ITransacaoRepository transacao, ICategoriaRepository categoria, NotificacaoViewModel notificacao)
@@ -76,7 +102,9 @@ namespace FinanceControlDesktop.ViewModels
             SalvarCommand = new RelayCommand(Salvar);
             CancelamentoCommand = new RelayCommand(Cancelamento);
             RemoverCommand = new RelayCommand(Remover);
-
+            FiltrarCommand = new RelayCommand(Filtrar);
+            AlternarFiltrosCommand = new RelayCommand(AlternarFiltros);
+            LimparFiltrosCommand = new RelayCommand(LimparFiltros);
 
         }
 
@@ -186,5 +214,29 @@ namespace FinanceControlDesktop.ViewModels
         }
 
 
+        public void Filtrar()
+        {
+            int? categoriaId = CategoriaFiltro?.Id;
+            List<Transacao> resultado = _transacaoRepository.ObterPorFiltro(DataInicio, DataFim, TipoFiltro, categoriaId);
+            Transacoes.Clear();
+            foreach (var transacao in resultado)
+            {
+                Transacoes.Add(transacao);
+            }
+        }
+
+        private void AlternarFiltros()
+        {
+            FiltrosVisiveis = !FiltrosVisiveis;
+        }
+
+        public void LimparFiltros()
+        {
+            DataInicio = null;
+            DataFim = null;
+            TipoFiltro = null;
+            CategoriaFiltro = null;
+            Filtrar();
+        }
     }
 }

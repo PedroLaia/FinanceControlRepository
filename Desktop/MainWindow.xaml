@@ -29,16 +29,13 @@
         <!-- Barra de título moderna da WPF UI -->
         <ui:TitleBar Grid.Row="0" Title="Finance Control"/>
 
-        <!-- Abas, uma por tela -->
+        <!-- Abas (Histórico foi unido à aba Transações) -->
         <TabControl Grid.Row="1" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Categorias">
                 <view:CategoriaView DataContext="{Binding CategoriaVM}"/>
             </TabItem>
             <TabItem Header="Transações">
                 <view:TransacaoView DataContext="{Binding TransacaoVM}"/>
-            </TabItem>
-            <TabItem Header="Histórico">
-                <view:HistoricoView DataContext="{Binding HistoricoVM}"/>
             </TabItem>
             <TabItem Header="Resumo">
                 <view:ResumoView DataContext="{Binding ResumoVM}"/>
@@ -69,7 +66,7 @@
                     <TextBlock Text="{Binding NotificacaoVM.Mensagem}" Foreground="#C3C9D4" FontSize="12" TextWrapping="Wrap"/>
                 </StackPanel>
 
-                <!-- Fechar manual (além do sumiço automático) -->
+                <!-- Fechar manual -->
                 <Button Grid.Column="2" Content="✕" Command="{Binding NotificacaoVM.EsconderCommand}"
                         Background="Transparent" BorderBrush="Transparent" Foreground="#9AA3B2"
                         VerticalAlignment="Top" Padding="6,2" Margin="8,0,0,0"/>

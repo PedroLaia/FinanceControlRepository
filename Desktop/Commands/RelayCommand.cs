@@ -11,6 +11,12 @@ namespace FinanceControlDesktop.Commands
     {
         private readonly Action _executar;
         private readonly Func<bool>? _podeExecutar;
+        private ICommand? alternarFiltros;
+
+        public RelayCommand(ICommand? alternarFiltros)
+        {
+            this.alternarFiltros = alternarFiltros;
+        }
 
         public RelayCommand(Action executar, Func<bool>? podeExecutar = null)
         {

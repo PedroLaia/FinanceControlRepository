@@ -12,14 +12,19 @@
         <conv:TipoParaCorConverter x:Key="TipoCor"/>
         <conv:TipoParaSetaConverter x:Key="TipoSeta"/>
         <conv:ValorComSinalConverter x:Key="ValorSinal"/>
+        <conv:EnumParaTextoConverter x:Key="EnumTexto"/>
     </UserControl.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Row 0: formulário -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 1: título Histórico + botão Filtros -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 2: painel de filtros (recolhível) -->
             <RowDefinition Height="*"/>
-            <!-- Row 1: lista -->
+            <!-- Row 3: lista -->
         </Grid.RowDefinitions>
 
         <!-- Formulário de nova transação (serve também pro modo edição) -->
@@ -59,7 +64,13 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Tipo"/>
-                    <ComboBox ItemsSource="{Binding Tipos}" SelectedItem="{Binding TipoSelecionado}" Margin="0,2,0,0"/>
+                    <ComboBox ItemsSource="{Binding Tipos}" SelectedItem="{Binding TipoSelecionado}" Margin="0,2,0,0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Categoria"/>
@@ -69,7 +80,6 @@
 
             <!-- Botões: Adicionar (modo normal) ↔ Salvar/Cancelar (modo edição) -->
             <StackPanel Orientation="Horizontal">
-                <!-- Adicionar: some quando ModoEdicao = true (via Style/DataTrigger) -->
                 <Button Content="Adicionar transação" Command="{Binding AdicionarCommand}" Padding="12,6">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -81,7 +91,6 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <!-- Salvar + Cancelar: aparecem só em modo edição -->
                 <Button Content="Salvar edição" Command="{Binding SalvarCommand}" Padding="12,6"
                         Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
                 <Button Content="Cancelar" Command="{Binding CancelamentoCommand}" Padding="12,6" Margin="8,0,0,0"
@@ -90,8 +99,64 @@
 
         </StackPanel>
 
-        <!-- Lista: SelectedItem -> TransacaoSelecionada; botões Editar/Excluir só na linha selecionada -->
-        <ListBox Grid.Row="1" Margin="0,12,0,0"
+        <!-- Título Histórico + botão Filtros (alterna o painel) -->
+        <Grid Grid.Row="1" Margin="0,16,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Histórico" FontSize="15" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="Filtros" Command="{Binding AlternarFiltrosCommand}" Padding="12,4"/>
+        </Grid>
+
+        <!-- Painel de filtros: aparece só quando FiltrosVisiveis = true -->
+        <Border Grid.Row="2" Margin="0,0,0,10" Padding="10" CornerRadius="6"
+                BorderBrush="#33888888" BorderThickness="1"
+                Visibility="{Binding FiltrosVisiveis, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Início" FontSize="11"/>
+                    <DatePicker SelectedDate="{Binding DataInicio}" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Fim" FontSize="11"/>
+                    <DatePicker SelectedDate="{Binding DataFim}" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Tipo" FontSize="11"/>
+                    <ComboBox ItemsSource="{Binding Tipos}" SelectedItem="{Binding TipoFiltro}" Margin="0,2,0,0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Column="6">
+                    <TextBlock Text="Categoria" FontSize="11"/>
+                    <ComboBox ItemsSource="{Binding Categorias}" SelectedItem="{Binding CategoriaFiltro}" DisplayMemberPath="Nome" Margin="0,2,0,0"/>
+                </StackPanel>
+                <!-- Filtrar + Limpar -->
+                <StackPanel Grid.Column="8" Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Button Content="Filtrar" Command="{Binding FiltrarCommand}" Padding="16,6" Margin="0,0,6,0"/>
+                    <Button Content="Limpar" Command="{Binding LimparFiltrosCommand}" Padding="16,6"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Lista: SelectedItem -> TransacaoSelecionada; Editar/Excluir só na linha selecionada -->
+        <ListBox Grid.Row="3"
                  ItemsSource="{Binding Transacoes}"
                  SelectedItem="{Binding TransacaoSelecionada}"
                  HorizontalContentAlignment="Stretch">
@@ -103,14 +168,13 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-
                             <!-- Badge primeiro: largura fixa + conteúdo centralizado -->
                             <Border Background="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Fundo}"
                                     CornerRadius="20" Padding="9,3" Margin="0,0,12,0" VerticalAlignment="Center" Width="95">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding Tipo, Converter={StaticResource TipoSeta}}"
                                                Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}" Margin="0,0,4,0"/>
-                                    <TextBlock Text="{Binding Tipo}" FontSize="12"
+                                    <TextBlock Text="{Binding Tipo, Converter={StaticResource EnumTexto}}" FontSize="12"
                                                Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}"/>
                                 </StackPanel>
                             </Border>
