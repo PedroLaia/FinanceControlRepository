@@ -4,14 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
+             xmlns:conv="clr-namespace:FinanceControlDesktop.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <!-- Valor -> cor pelo sinal (verde >= 0, vermelho < 0): Saldo e extrato -->
+        <conv:ValorParaCorConverter x:Key="ValorCor"/>
+        <!-- Enum -> texto amigável (Mês Atual, Saídas...) -->
+        <conv:EnumParaTextoConverter x:Key="EnumTexto"/>
+    </UserControl.Resources>
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Row 0: filtro de período -->
             <RowDefinition Height="Auto"/>
+            <!-- Row 1: cartões -->
             <RowDefinition Height="Auto"/>
+            <!-- Row 2: título do extrato + filtro de tipo -->
             <RowDefinition Height="*"/>
+            <!-- Row 3: lista do extrato -->
         </Grid.RowDefinitions>
 
         <!-- Filtro de Período (afeta a tela toda) -->
@@ -19,10 +31,17 @@
             <TextBlock Text="Período:" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <ComboBox ItemsSource="{Binding Periodos}"
                       SelectedItem="{Binding PeriodoSelecionado}"
-                      Width="150"/>
+                      Width="150">
+                <!-- ItemTemplate: mostra o texto amigável do enum -->
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </StackPanel>
 
-        <!-- Cartões -->
+        <!-- Cartões (fundo com tom suave + valor colorido) -->
         <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -32,24 +51,28 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="14">
+            <!-- Entradas: fundo verde claro, valor verde -->
+            <Border Grid.Column="0" Background="#EAF3DE" CornerRadius="12" Padding="14">
                 <StackPanel>
-                    <TextBlock Text="Entradas" FontSize="12"/>
-                    <TextBlock Text="{Binding TotalEntradas, StringFormat=C}" FontSize="18"/>
+                    <TextBlock Text="Entradas" FontSize="12" Foreground="#27500A"/>
+                    <TextBlock Text="{Binding TotalEntradas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#16A34A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="14">
+            <!-- Saídas: fundo vermelho claro, valor vermelho -->
+            <Border Grid.Column="2" Background="#FCEBEB" CornerRadius="12" Padding="14">
                 <StackPanel>
-                    <TextBlock Text="Saídas" FontSize="12"/>
-                    <TextBlock Text="{Binding TotalSaidas, StringFormat=C}" FontSize="18"/>
+                    <TextBlock Text="Saídas" FontSize="12" Foreground="#791F1F"/>
+                    <TextBlock Text="{Binding TotalSaidas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#DC2626"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="4" BorderBrush="LightGray" BorderThickness="1" CornerRadius="8" Padding="14">
+            <!-- Saldo: fundo cinza neutro, valor colorido pelo sinal -->
+            <Border Grid.Column="4" Background="#F1EFE8" CornerRadius="12" Padding="14">
                 <StackPanel>
-                    <TextBlock Text="Saldo" FontSize="12"/>
-                    <TextBlock Text="{Binding Saldo, StringFormat=C}" FontSize="18"/>
+                    <TextBlock Text="Saldo" FontSize="12" Foreground="#444441"/>
+                    <TextBlock Text="{Binding Saldo, StringFormat=C}" FontSize="22" FontWeight="SemiBold"
+                               Foreground="{Binding Saldo, Converter={StaticResource ValorCor}}"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -67,12 +90,19 @@
                 <TextBlock Text="Tipo:" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <ComboBox ItemsSource="{Binding TiposFiltro}"
                           SelectedItem="{Binding TipoFiltroSelecionado}"
-                          Width="150"/>
+                          Width="150">
+                    <!-- ItemTemplate: texto amigável (Todos / Entradas / Saídas) -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
         </Grid>
 
-        <!-- Lista do extrato -->
-        <ListBox Grid.Row="3" ItemsSource="{Binding ExtratoPorCategoria}">
+        <!-- Lista do extrato: categoria + valor colorido pelo sinal -->
+        <ListBox Grid.Row="3" ItemsSource="{Binding ExtratoPorCategoria}" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -80,8 +110,9 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Key}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat=C}" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="0" Text="{Binding Key}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat=C}" FontWeight="SemiBold"
+                                   Foreground="{Binding Value, Converter={StaticResource ValorCor}}"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

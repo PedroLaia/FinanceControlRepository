@@ -10,15 +10,15 @@ namespace FinanceControlDesktop.ViewModels
     {
         public CategoriaViewModel CategoriaVM { get; }
         public TransacaoViewModel TransacaoVM { get; }
-        public HistoricoViewModel HistoricoVM { get; }
         public ResumoViewModel ResumoVM { get; }
+        public NotificacaoViewModel NotificacaoVM { get; }
 
-        public MainViewModel(CategoriaViewModel categoriaVM, TransacaoViewModel transacaoVM, HistoricoViewModel historicoVM, ResumoViewModel resumoVM)
+        public MainViewModel(CategoriaViewModel categoriaVM, TransacaoViewModel transacaoVM, ResumoViewModel resumoVM, NotificacaoViewModel notificacaoVM)
         {
             CategoriaVM = categoriaVM;
             TransacaoVM = transacaoVM;
-            HistoricoVM = historicoVM;
             ResumoVM = resumoVM;
+            NotificacaoVM = notificacaoVM;
         }
 
 

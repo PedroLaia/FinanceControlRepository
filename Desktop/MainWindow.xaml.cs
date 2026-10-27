@@ -32,11 +32,12 @@ namespace FinanceControlDesktop
             var categoriaRepository = new CategoriaRepository(context);
             var transacaoRepository = new TransacaoRepository(context);
 
-            var categoriaVM = new CategoriaViewModel(categoriaRepository, transacaoRepository);
-            var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository);
-            var historicoVM = new HistoricoViewModel(transacaoRepository, categoriaRepository);
+            var notificacaoVM = new NotificacaoViewModel();
+
+            var categoriaVM = new CategoriaViewModel(categoriaRepository, transacaoRepository, notificacaoVM);
+            var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository, notificacaoVM);
             var resumoVM = new ResumoViewModel(transacaoRepository);
-            var mainVM = new MainViewModel(categoriaVM, transacaoVM, historicoVM, resumoVM);
+            var mainVM = new MainViewModel(categoriaVM, transacaoVM, resumoVM, notificacaoVM);
 
             DataContext = mainVM;
         }
@@ -48,8 +49,6 @@ namespace FinanceControlDesktop
                 if (DataContext is MainViewModel main)
                 {
                     main.TransacaoVM.CarregarCategorias();
-                    main.HistoricoVM.CarregarCategorias();
-                    main.HistoricoVM.Filtrar();
                     main.ResumoVM.CalcularResumo();
                 }
             }

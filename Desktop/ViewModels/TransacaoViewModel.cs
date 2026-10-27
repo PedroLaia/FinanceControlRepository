@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace FinanceControlDesktop.ViewModels
@@ -20,6 +22,8 @@ namespace FinanceControlDesktop.ViewModels
         private readonly ITransacaoRepository _transacaoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
 
+        private readonly NotificacaoViewModel _notificacao;
+
         public ObservableCollection<Transacao> Transacoes { get; }
         public ObservableCollection<Categoria> Categorias { get; }
 
@@ -29,6 +33,8 @@ namespace FinanceControlDesktop.ViewModels
         public ICommand EditarCommand { get; }
         public ICommand SalvarCommand { get; }
         public ICommand CancelamentoCommand { get; }
+        public ICommand RemoverCommand { get; }
+
 
 
         private string _descricao = string.Empty;
@@ -57,20 +63,48 @@ namespace FinanceControlDesktop.ViewModels
         private bool _modoEdicao = false;
         public bool ModoEdicao { get => _modoEdicao; set { _modoEdicao = value; OnPropertyChanged(); } }
 
+        
+        ////////////HISTORICO
+        
+        public ICommand FiltrarCommand { get; }
+        public ICommand AlternarFiltrosCommand { get; }
+        
+        public ICommand LimparFiltrosCommand { get; }
+
+        private DateTime? _dataInicio;
+        public DateTime? DataInicio { get => _dataInicio; set { _dataInicio = value; OnPropertyChanged(); } }
+
+        private DateTime? _dataFim;
+        public DateTime? DataFim { get => _dataFim; set { _dataFim = value; OnPropertyChanged(); } }
+
+        private TipoTransacao? _tipoFiltro;
+        public TipoTransacao? TipoFiltro { get => _tipoFiltro; set { _tipoFiltro = value; OnPropertyChanged(); } }
+
+        private Categoria? _categoriaFiltro;
+        public Categoria? CategoriaFiltro { get => _categoriaFiltro; set { _categoriaFiltro = value; OnPropertyChanged(); } }
+
+        private bool _filtrosVisiveis = false;
+        public bool FiltrosVisiveis { get => _filtrosVisiveis; set { _filtrosVisiveis = value; OnPropertyChanged(); } }
+
+        ////////////HISTORICO
 
 
-        public TransacaoViewModel(ITransacaoRepository transacao, ICategoriaRepository categoria)
+
+        public TransacaoViewModel(ITransacaoRepository transacao, ICategoriaRepository categoria, NotificacaoViewModel notificacao)
         {
             _transacaoRepository = transacao;
             _categoriaRepository = categoria;
+            _notificacao = notificacao;
             Transacoes = new ObservableCollection<Transacao>(_transacaoRepository.ObterTodas());
             Categorias = new ObservableCollection<Categoria>(_categoriaRepository.ObterTodas());
             AdicionarCommand = new RelayCommand(Adicionar);
             EditarCommand = new RelayCommand(Editar);
             SalvarCommand = new RelayCommand(Salvar);
-                        
             CancelamentoCommand = new RelayCommand(Cancelamento);
-
+            RemoverCommand = new RelayCommand(Remover);
+            FiltrarCommand = new RelayCommand(Filtrar);
+            AlternarFiltrosCommand = new RelayCommand(AlternarFiltros);
+            LimparFiltrosCommand = new RelayCommand(LimparFiltros);
 
         }
 
@@ -82,7 +116,7 @@ namespace FinanceControlDesktop.ViewModels
             ResultadoValidacao resultado = validator.Validar(nova);
             if (!resultado.Valido)
             {
-                MensagemErro = string.Join("\n", resultado.Erros);
+                _notificacao.Mostrar("Erro de Validação", string.Join("\n", resultado.Erros));
                 return;
             }
 
@@ -127,7 +161,7 @@ namespace FinanceControlDesktop.ViewModels
             ResultadoValidacao resultado = validator.Validar(TransacaoSelecionada);
             if (!resultado.Valido)
             {
-                MensagemErro = string.Join("\n", resultado.Erros);
+                _notificacao.Mostrar("Erro de Validação", string.Join("\n", resultado.Erros));
                 return;
             }
 
@@ -142,7 +176,7 @@ namespace FinanceControlDesktop.ViewModels
                 Transacoes.Add(transacao);
             }
 
-                Descricao = string.Empty;
+            Descricao = string.Empty;
             Valor = 0;
             Data = DateTime.Now;
             TipoSelecionado = TipoTransacao.Entrada;
@@ -158,6 +192,51 @@ namespace FinanceControlDesktop.ViewModels
             TipoSelecionado = TipoTransacao.Entrada;
             CategoriaSelecionada = null;
             ModoEdicao = false;
+        }
+
+
+        public void Remover()
+        {
+            if (TransacaoSelecionada == null)
+                return;
+
+            var resposta = MessageBox.Show(
+                "Deseja excluir esta transação?",
+                "Confirmar exclusão",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (resposta != MessageBoxResult.Yes)
+                return;
+
+            _transacaoRepository.Remover(TransacaoSelecionada.Id);
+            Transacoes.Remove(TransacaoSelecionada);
+        }
+
+
+        public void Filtrar()
+        {
+            int? categoriaId = CategoriaFiltro?.Id;
+            List<Transacao> resultado = _transacaoRepository.ObterPorFiltro(DataInicio, DataFim, TipoFiltro, categoriaId);
+            Transacoes.Clear();
+            foreach (var transacao in resultado)
+            {
+                Transacoes.Add(transacao);
+            }
+        }
+
+        private void AlternarFiltros()
+        {
+            FiltrosVisiveis = !FiltrosVisiveis;
+        }
+
+        public void LimparFiltros()
+        {
+            DataInicio = null;
+            DataFim = null;
+            TipoFiltro = null;
+            CategoriaFiltro = null;
+            Filtrar();
         }
     }
 }
