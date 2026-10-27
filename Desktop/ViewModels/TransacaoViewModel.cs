@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FinanceControlDesktop.ViewModels
@@ -20,6 +21,8 @@ namespace FinanceControlDesktop.ViewModels
         private readonly ITransacaoRepository _transacaoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
 
+        private readonly NotificacaoViewModel _notificacao;
+
         public ObservableCollection<Transacao> Transacoes { get; }
         public ObservableCollection<Categoria> Categorias { get; }
 
@@ -29,6 +32,8 @@ namespace FinanceControlDesktop.ViewModels
         public ICommand EditarCommand { get; }
         public ICommand SalvarCommand { get; }
         public ICommand CancelamentoCommand { get; }
+        public ICommand RemoverCommand { get; }
+
 
 
         private string _descricao = string.Empty;
@@ -59,17 +64,18 @@ namespace FinanceControlDesktop.ViewModels
 
 
 
-        public TransacaoViewModel(ITransacaoRepository transacao, ICategoriaRepository categoria)
+        public TransacaoViewModel(ITransacaoRepository transacao, ICategoriaRepository categoria, NotificacaoViewModel notificacao)
         {
             _transacaoRepository = transacao;
             _categoriaRepository = categoria;
+            _notificacao = notificacao;
             Transacoes = new ObservableCollection<Transacao>(_transacaoRepository.ObterTodas());
             Categorias = new ObservableCollection<Categoria>(_categoriaRepository.ObterTodas());
             AdicionarCommand = new RelayCommand(Adicionar);
             EditarCommand = new RelayCommand(Editar);
             SalvarCommand = new RelayCommand(Salvar);
-                        
             CancelamentoCommand = new RelayCommand(Cancelamento);
+            RemoverCommand = new RelayCommand(Remover);
 
 
         }
@@ -82,7 +88,7 @@ namespace FinanceControlDesktop.ViewModels
             ResultadoValidacao resultado = validator.Validar(nova);
             if (!resultado.Valido)
             {
-                MensagemErro = string.Join("\n", resultado.Erros);
+                _notificacao.Mostrar("Erro de Validação", string.Join("\n", resultado.Erros));
                 return;
             }
 
@@ -127,7 +133,7 @@ namespace FinanceControlDesktop.ViewModels
             ResultadoValidacao resultado = validator.Validar(TransacaoSelecionada);
             if (!resultado.Valido)
             {
-                MensagemErro = string.Join("\n", resultado.Erros);
+                _notificacao.Mostrar("Erro de Validação", string.Join("\n", resultado.Erros));
                 return;
             }
 
@@ -142,7 +148,7 @@ namespace FinanceControlDesktop.ViewModels
                 Transacoes.Add(transacao);
             }
 
-                Descricao = string.Empty;
+            Descricao = string.Empty;
             Valor = 0;
             Data = DateTime.Now;
             TipoSelecionado = TipoTransacao.Entrada;
@@ -159,5 +165,26 @@ namespace FinanceControlDesktop.ViewModels
             CategoriaSelecionada = null;
             ModoEdicao = false;
         }
+
+
+        public void Remover()
+        {
+            if (TransacaoSelecionada == null)
+                return;
+
+            var resposta = MessageBox.Show(
+                "Deseja excluir esta transação?",
+                "Confirmar exclusão",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (resposta != MessageBoxResult.Yes)
+                return;
+
+            _transacaoRepository.Remover(TransacaoSelecionada.Id);
+            Transacoes.Remove(TransacaoSelecionada);
+        }
+
+
     }
 }

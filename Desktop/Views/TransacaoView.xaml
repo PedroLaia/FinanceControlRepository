@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
+             xmlns:conv="clr-namespace:FinanceControlDesktop.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:TipoParaCorConverter x:Key="TipoCor"/>
+        <conv:TipoParaSetaConverter x:Key="TipoSeta"/>
+        <conv:ValorComSinalConverter x:Key="ValorSinal"/>
     </UserControl.Resources>
 
     <Grid Margin="16">
@@ -18,15 +22,17 @@
             <!-- Row 1: lista -->
         </Grid.RowDefinitions>
 
+        <!-- Formulário de nova transação (serve também pro modo edição) -->
         <StackPanel Grid.Row="0">
 
-            <!-- Faixa "Editando" (só em modo edição) -->
+            <!-- Faixa "Editando" (só aparece em modo edição) -->
             <TextBlock Text="Editando transação" FontWeight="SemiBold" Margin="0,0,0,8"
                        Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
 
             <TextBlock Text="Descrição"/>
             <TextBox Text="{Binding Descricao, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,10"/>
 
+            <!-- Linha com Valor e Data lado a lado -->
             <Grid Margin="0,0,0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -44,6 +50,7 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Linha com Tipo e Categoria lado a lado -->
             <Grid Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -60,8 +67,9 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Botões: Adicionar (normal) ↔ Salvar/Cancelar (edição) -->
+            <!-- Botões: Adicionar (modo normal) ↔ Salvar/Cancelar (modo edição) -->
             <StackPanel Orientation="Horizontal">
+                <!-- Adicionar: some quando ModoEdicao = true (via Style/DataTrigger) -->
                 <Button Content="Adicionar transação" Command="{Binding AdicionarCommand}" Padding="12,6">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -73,17 +81,16 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <!-- Salvar + Cancelar: aparecem só em modo edição -->
                 <Button Content="Salvar edição" Command="{Binding SalvarCommand}" Padding="12,6"
                         Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
                 <Button Content="Cancelar" Command="{Binding CancelamentoCommand}" Padding="12,6" Margin="8,0,0,0"
                         Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}"/>
-
-                <TextBlock Text="{Binding MensagemErro}" Foreground="Red" TextWrapping="Wrap" VerticalAlignment="Center" Margin="12,0,0,0"/>
             </StackPanel>
 
         </StackPanel>
 
-        <!-- Lista: SelectedItem -> TransacaoSelecionada; botão Editar só na linha selecionada -->
+        <!-- Lista: SelectedItem -> TransacaoSelecionada; botões Editar/Excluir só na linha selecionada -->
         <ListBox Grid.Row="1" Margin="0,12,0,0"
                  ItemsSource="{Binding Transacoes}"
                  SelectedItem="{Binding TransacaoSelecionada}"
@@ -96,15 +103,43 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90"/>
-                            <TextBlock Text="{Binding Tipo}" Width="70"/>
-                            <TextBlock Text="{Binding Descricao}" Width="160"/>
-                            <TextBlock Text="{Binding Categoria.Nome}" Width="120"/>
-                            <TextBlock Text="{Binding Valor, StringFormat=C}"/>
+
+                            <!-- Badge primeiro: largura fixa + conteúdo centralizado -->
+                            <Border Background="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Fundo}"
+                                    CornerRadius="20" Padding="9,3" Margin="0,0,12,0" VerticalAlignment="Center" Width="95">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Tipo, Converter={StaticResource TipoSeta}}"
+                                               Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}" Margin="0,0,4,0"/>
+                                    <TextBlock Text="{Binding Tipo}" FontSize="12"
+                                               Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Descricao}" Width="160" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Categoria.Nome}" Width="120" VerticalAlignment="Center"/>
+
+                            <!-- Valor colorido + sinal (MultiBinding Tipo + Valor) -->
+                            <TextBlock Width="110" TextAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold"
+                                       Foreground="{Binding Tipo, Converter={StaticResource TipoCor}}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource ValorSinal}">
+                                        <Binding Path="Tipo"/>
+                                        <Binding Path="Valor"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </StackPanel>
-                        <Button Grid.Column="1" Content="Editar" Padding="10,2"
-                                Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource BoolToVis}}"/>
+
+                        <!-- Editar + Excluir: só na linha selecionada -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                    Visibility="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource BoolToVis}}">
+                            <Button Content="Editar" Padding="10,2" Margin="0,0,6,0"
+                                    Command="{Binding DataContext.EditarCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                            <Button Content="Excluir" Padding="10,2"
+                                    Foreground="#A32D2D" BorderBrush="#F0999B"
+                                    Command="{Binding DataContext.RemoverCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

@@ -19,6 +19,8 @@ namespace FinanceControlDesktop.ViewModels
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly ITransacaoRepository _transacaoRepository;
 
+        private readonly NotificacaoViewModel _notificacao;
+
         public ObservableCollection<Categoria> Categorias { get; }
 
         public ICommand AdicionarCommand { get; }
@@ -43,10 +45,11 @@ namespace FinanceControlDesktop.ViewModels
         public bool ModoEdicao { get => _modoEdicao; set { _modoEdicao = value; OnPropertyChanged(); } }
 
 
-        public CategoriaViewModel(ICategoriaRepository categoria, ITransacaoRepository transacao)
+        public CategoriaViewModel(ICategoriaRepository categoria, ITransacaoRepository transacao, NotificacaoViewModel notificacao)
         {
             _categoriaRepository = categoria;
             _transacaoRepository = transacao;
+            _notificacao = notificacao;
             Categorias = new ObservableCollection<Categoria>(_categoriaRepository.ObterTodas());
             AdicionarCommand = new RelayCommand(Adicionar, PodeAdicionar);
             RemoverCommand = new RelayCommand(Remover, PodeRemover);
@@ -72,7 +75,7 @@ namespace FinanceControlDesktop.ViewModels
             }
             if (_transacaoRepository.ExisteCategoria(CategoriaSelecionada.Id))
             {
-                MensagemExcluir = "A Categoria tem Transações, Transfira as Transações ou Remova antes de Excluir a Categoria.";
+                _notificacao.Mostrar("Categoria em Uso", "A Categoria tem Transações, Transfira as Transações ou Remova antes de Excluir a Categoria.");
                 return;
             }
             _categoriaRepository.Remover(CategoriaSelecionada.Id);

@@ -4,12 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
+             xmlns:conv="clr-namespace:FinanceControlDesktop.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <!-- Converters visuais: Tipo -> cor, Tipo -> seta, (Tipo + Valor) -> valor com sinal -->
+        <conv:TipoParaCorConverter x:Key="TipoCor"/>
+        <conv:TipoParaSetaConverter x:Key="TipoSeta"/>
+        <conv:ValorComSinalConverter x:Key="ValorSinal"/>
+    </UserControl.Resources>
+
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Row 0: painel de filtros -->
-            <RowDefinition Height="*"/>      <!-- Row 1: lista de resultados -->
+            <RowDefinition Height="Auto"/>
+            <!-- Row 0: painel de filtros -->
+            <RowDefinition Height="*"/>
+            <!-- Row 1: lista de resultados -->
         </Grid.RowDefinitions>
 
         <!-- Painel de filtros -->
@@ -55,16 +65,38 @@
             </Grid>
         </StackPanel>
 
-        <!-- Lista de resultados filtrados (mesmo layout de linha da tela de Transações) -->
-        <ListBox Grid.Row="1" ItemsSource="{Binding Transacoes}">
+        <!-- Lista de resultados (mesmo visual da tela de Transações: badge + valor colorido) -->
+        <ListBox Grid.Row="1" ItemsSource="{Binding Transacoes}" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90"/>
-                        <TextBlock Text="{Binding Tipo}" Width="70"/>
-                        <TextBlock Text="{Binding Descricao}" Width="160"/>
-                        <TextBlock Text="{Binding Categoria.Nome}" Width="120"/>
-                        <TextBlock Text="{Binding Valor, StringFormat=C}"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                        <!-- Badge primeiro: largura fixa + conteúdo centralizado -->
+                        <Border Background="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Fundo}"
+                                CornerRadius="20" Padding="9,3" Margin="0,0,12,0" VerticalAlignment="Center" Width="95">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Tipo, Converter={StaticResource TipoSeta}}"
+                                           Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}" Margin="0,0,4,0"/>
+                                <TextBlock Text="{Binding Tipo}" FontSize="12"
+                                           Foreground="{Binding Tipo, Converter={StaticResource TipoCor}, ConverterParameter=Texto}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="{Binding Data, StringFormat=dd/MM/yyyy}" Width="90" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Descricao}" Width="160" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Categoria.Nome}" Width="120" VerticalAlignment="Center"/>
+                        <!-- binding aninhado -->
+
+                        <!-- Valor colorido + sinal: MultiBinding passa Tipo + Valor pro ValorSinal -->
+                        <TextBlock Width="110" TextAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold"
+                                   Foreground="{Binding Tipo, Converter={StaticResource TipoCor}}">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource ValorSinal}">
+                                    <Binding Path="Tipo"/>
+                                    <Binding Path="Valor"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

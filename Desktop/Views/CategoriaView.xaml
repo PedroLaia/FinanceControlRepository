@@ -17,9 +17,7 @@
             <RowDefinition Height="*"/>
             <!-- Row 1: lista -->
             <RowDefinition Height="Auto"/>
-            <!-- Row 2: mensagem (sempre visível) -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 3: painel de edição (só em modo edição) -->
+            <!-- Row 2: painel de edição (só em modo edição) -->
         </Grid.RowDefinitions>
 
         <!-- Nova categoria -->
@@ -58,13 +56,8 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Mensagem de "categoria em uso" (sempre presente; vazia não ocupa nada) -->
-        <TextBlock Grid.Row="2"
-                   Text="{Binding MensagemExcluir}"
-                   Foreground="Red" TextWrapping="Wrap" Margin="0,8,0,0"/>
-
         <!-- Painel de edição: só o nome + Salvar, aparece quando ModoEdicao = true -->
-        <StackPanel Grid.Row="3" Margin="0,12,0,0"
+        <StackPanel Grid.Row="2" Margin="0,12,0,0"
                     Visibility="{Binding ModoEdicao, Converter={StaticResource BoolToVis}}">
             <TextBlock Text="Editar selecionada" Margin="0,0,0,6"/>
             <Grid>

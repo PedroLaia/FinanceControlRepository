@@ -32,11 +32,13 @@ namespace FinanceControlDesktop
             var categoriaRepository = new CategoriaRepository(context);
             var transacaoRepository = new TransacaoRepository(context);
 
-            var categoriaVM = new CategoriaViewModel(categoriaRepository, transacaoRepository);
-            var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository);
+            var notificacaoVM = new NotificacaoViewModel();
+
+            var categoriaVM = new CategoriaViewModel(categoriaRepository, transacaoRepository, notificacaoVM);
+            var transacaoVM = new TransacaoViewModel(transacaoRepository, categoriaRepository, notificacaoVM);
             var historicoVM = new HistoricoViewModel(transacaoRepository, categoriaRepository);
             var resumoVM = new ResumoViewModel(transacaoRepository);
-            var mainVM = new MainViewModel(categoriaVM, transacaoVM, historicoVM, resumoVM);
+            var mainVM = new MainViewModel(categoriaVM, transacaoVM, historicoVM, resumoVM, notificacaoVM);
 
             DataContext = mainVM;
         }

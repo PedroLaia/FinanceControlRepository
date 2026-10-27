@@ -13,12 +13,17 @@
         WindowBackdropType="Mica"
         WindowCornerPreference="Round">
 
+    <ui:FluentWindow.Resources>
+        <!-- Converte bool -> Visibility (mostra o snackbar quando Visivel = true) -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </ui:FluentWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- barra de título -->
             <RowDefinition Height="*"/>
-            <!-- conteúdo (abas) -->
+            <!-- conteúdo (abas) + snackbar sobreposto -->
         </Grid.RowDefinitions>
 
         <!-- Barra de título moderna da WPF UI -->
@@ -39,5 +44,36 @@
                 <view:ResumoView DataContext="{Binding ResumoVM}"/>
             </TabItem>
         </TabControl>
+
+        <!-- Snackbar: flutua no rodapé, sobre as abas. Aparece quando NotificacaoVM.Visivel = true -->
+        <Border Grid.Row="1" VerticalAlignment="Bottom" Margin="16" CornerRadius="10"
+                Background="#1F2430" Padding="12,10"
+                Visibility="{Binding NotificacaoVM.Visivel, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ícone em círculo -->
+                <Border Grid.Column="0" Width="30" Height="30" CornerRadius="15" Background="#55E04B4A"
+                        VerticalAlignment="Center" Margin="0,0,12,0">
+                    <TextBlock Text="⚠" FontSize="15" Foreground="#F09595"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <!-- Título + mensagem -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding NotificacaoVM.Titulo}" Foreground="#F1F5F9" FontWeight="SemiBold" FontSize="13"/>
+                    <TextBlock Text="{Binding NotificacaoVM.Mensagem}" Foreground="#C3C9D4" FontSize="12" TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Fechar manual (além do sumiço automático) -->
+                <Button Grid.Column="2" Content="✕" Command="{Binding NotificacaoVM.EsconderCommand}"
+                        Background="Transparent" BorderBrush="Transparent" Foreground="#9AA3B2"
+                        VerticalAlignment="Top" Padding="6,2" Margin="8,0,0,0"/>
+            </Grid>
+        </Border>
     </Grid>
 </ui:FluentWindow>
