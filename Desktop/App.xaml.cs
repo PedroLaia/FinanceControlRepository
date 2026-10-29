@@ -1,6 +1,9 @@
-﻿using System.Configuration;
+﻿using LiveChartsCore.SkiaSharpView;
+using System.Configuration;
 using System.Data;
 using System.Windows;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 
 namespace FinanceControlDesktop
 {
@@ -18,6 +21,7 @@ namespace FinanceControlDesktop
                 new FrameworkPropertyMetadata(
                     System.Windows.Markup.XmlLanguage.GetLanguage(
                         System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
+            LiveChartsCore.LiveCharts.Configure(config => config.AddDarkTheme());
         }
 
 

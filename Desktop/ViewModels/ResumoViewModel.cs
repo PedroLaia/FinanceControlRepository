@@ -2,6 +2,10 @@
 using FinanceControlCore.Enums;
 using FinanceControlCore.Services;
 using FinanceControlData.Repositories;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,13 +45,20 @@ namespace FinanceControlDesktop.ViewModels
         public Array TiposFiltro { get; } = Enum.GetValues(typeof(TipoFiltroResumo));
         public Array Periodos { get; } = Enum.GetValues(typeof(PeriodoResumo));
 
+        private ISeries[] _entradasSaidasSeries;
+        public ISeries[] EntradasSaidasSeries { get => _entradasSaidasSeries; set { _entradasSaidasSeries = value; OnPropertyChanged(); } }
 
+        private ISeries[] _gastosPorCategoriaSeries;
+        public ISeries[] GastosPorCategoriaSeries { get => _gastosPorCategoriaSeries; set { _gastosPorCategoriaSeries = value; OnPropertyChanged(); } }
+
+        public Axis[] EixoX { get; } = { new Axis { IsVisible = false } };
 
         public ResumoViewModel(ITransacaoRepository transacao)
         {
             _transacaoRepository = transacao;
             ExtratoPorCategoria = new ObservableCollection<KeyValuePair<string, decimal>>();
             CalcularResumo();
+
 
         }
 
@@ -102,6 +113,54 @@ namespace FinanceControlDesktop.ViewModels
             {
                 ExtratoPorCategoria.Add(item);
             }
+
+
+            // Barras: duas séries coloridas (verde Entradas / vermelho Saídas)
+            EntradasSaidasSeries = new ISeries[]
+            {
+                new ColumnSeries<double>
+                {
+                    Name = "Entradas",
+                    Values = new double[] { (double)TotalEntradas },
+                    Fill = new SolidColorPaint(SKColor.Parse("#16A34A"))
+                },
+                new ColumnSeries<double>
+                {
+                    Name = "Saídas",
+                    Values = new double[] { (double)TotalSaidas },
+                    Fill = new SolidColorPaint(SKColor.Parse("#DC2626"))
+                }
+            };
+
+            /// só categorias com saída (> 0)
+            var saidas = _resumoService.SaidasPorCategoria(transacoes)
+                .Where(x => x.Value > 0)
+                .ToList();
+
+            List<ISeries> fatias = new List<ISeries>();
+            for (int i = 0; i < saidas.Count; i++)
+            {
+                var item = saidas[i];
+
+                // tom espalhado pela roda de cores -> cada fatia uma cor única
+                float hue = (float)(i * 360.0 / saidas.Count);
+
+                fatias.Add(new PieSeries<double>
+                {
+                    Values = new double[] { (double)item.Value },
+                    Name = item.Key,
+                    Fill = new SolidColorPaint(SKColor.FromHsl(hue, 60, 55)),
+                    DataLabelsPaint = new SolidColorPaint(SKColors.White),
+                    DataLabelsFormatter = point => point.StackedValue.Share.ToString("P0")
+                });
+            }
+            GastosPorCategoriaSeries = fatias.ToArray();
+
+
         }
+
+
+
+
     }
 }

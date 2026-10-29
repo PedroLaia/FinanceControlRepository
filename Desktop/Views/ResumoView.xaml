@@ -5,93 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FinanceControlDesktop.Views"
              xmlns:conv="clr-namespace:FinanceControlDesktop.Converters"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="520" d:DesignWidth="800">
     <UserControl.Resources>
-        <!-- Valor -> cor pelo sinal (verde >= 0, vermelho < 0): Saldo e extrato -->
         <conv:ValorParaCorConverter x:Key="ValorCor"/>
-        <!-- Enum -> texto amigável (Mês Atual, Saídas...) -->
         <conv:EnumParaTextoConverter x:Key="EnumTexto"/>
     </UserControl.Resources>
 
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Row 0: filtro de período -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 1: cartões -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 2: título do extrato + filtro de tipo -->
-            <RowDefinition Height="*"/>
-            <!-- Row 3: lista do extrato -->
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Filtro de Período (afeta a tela toda) -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-            <TextBlock Text="Período:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <ComboBox ItemsSource="{Binding Periodos}"
-                      SelectedItem="{Binding PeriodoSelecionado}"
-                      Width="150">
-                <!-- ItemTemplate: mostra o texto amigável do enum -->
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </StackPanel>
-
-        <!-- Cartões (fundo com tom suave + valor colorido) -->
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Entradas: fundo verde claro, valor verde -->
-            <Border Grid.Column="0" Background="#EAF3DE" CornerRadius="12" Padding="14">
-                <StackPanel>
-                    <TextBlock Text="Entradas" FontSize="12" Foreground="#27500A"/>
-                    <TextBlock Text="{Binding TotalEntradas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#16A34A"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Saídas: fundo vermelho claro, valor vermelho -->
-            <Border Grid.Column="2" Background="#FCEBEB" CornerRadius="12" Padding="14">
-                <StackPanel>
-                    <TextBlock Text="Saídas" FontSize="12" Foreground="#791F1F"/>
-                    <TextBlock Text="{Binding TotalSaidas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#DC2626"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Saldo: fundo cinza neutro, valor colorido pelo sinal -->
-            <Border Grid.Column="4" Background="#F1EFE8" CornerRadius="12" Padding="14">
-                <StackPanel>
-                    <TextBlock Text="Saldo" FontSize="12" Foreground="#444441"/>
-                    <TextBlock Text="{Binding Saldo, StringFormat=C}" FontSize="22" FontWeight="SemiBold"
-                               Foreground="{Binding Saldo, Converter={StaticResource ValorCor}}"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- Título do extrato + filtro de Tipo (afeta só a lista) -->
-        <Grid Grid.Row="2" Margin="0,0,0,6">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0" Text="Extrato por Categoria" FontSize="15" VerticalAlignment="Center"/>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock Text="Tipo:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                <ComboBox ItemsSource="{Binding TiposFiltro}"
-                          SelectedItem="{Binding TipoFiltroSelecionado}"
-                          Width="150">
-                    <!-- ItemTemplate: texto amigável (Todos / Entradas / Saídas) -->
+            <!-- Filtro de Período -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+                <TextBlock Text="Período:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox ItemsSource="{Binding Periodos}" SelectedItem="{Binding PeriodoSelecionado}" Width="150">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
@@ -99,23 +34,100 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
             </StackPanel>
-        </Grid>
 
-        <!-- Lista do extrato: categoria + valor colorido pelo sinal -->
-        <ListBox Grid.Row="3" ItemsSource="{Binding ExtratoPorCategoria}" HorizontalContentAlignment="Stretch">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Key}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat=C}" FontWeight="SemiBold"
+            <!-- Cartões -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#EAF3DE" CornerRadius="12" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Entradas" FontSize="12" Foreground="#27500A"/>
+                        <TextBlock Text="{Binding TotalEntradas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#16A34A"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Background="#FCEBEB" CornerRadius="12" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Saídas" FontSize="12" Foreground="#791F1F"/>
+                        <TextBlock Text="{Binding TotalSaidas, StringFormat=C}" FontSize="22" FontWeight="SemiBold" Foreground="#DC2626"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="4" Background="#F1EFE8" CornerRadius="12" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Saldo" FontSize="12" Foreground="#444441"/>
+                        <TextBlock Text="{Binding Saldo, StringFormat=C}" FontSize="22" FontWeight="SemiBold"
+                               Foreground="{Binding Saldo, Converter={StaticResource ValorCor}}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Gráficos -->
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" BorderBrush="#33888888" BorderThickness="1" CornerRadius="12" Padding="12">
+                    <StackPanel>
+                        <TextBlock Text="Gastos por categoria" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <lvc:PieChart Series="{Binding GastosPorCategoriaSeries}" Height="200"
+                                  LegendPosition="Right" Background="Transparent"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" BorderBrush="#33888888" BorderThickness="1" CornerRadius="12" Padding="12">
+                    <StackPanel>
+                        <TextBlock Text="Entradas × Saídas" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <lvc:CartesianChart Series="{Binding EntradasSaidasSeries}"
+                                        XAxes="{Binding EixoX}"
+                                        Height="200"
+                                        LegendPosition="Bottom"
+                                        Background="Transparent"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Título do extrato + filtro de Tipo -->
+            <Grid Grid.Row="3" Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Extrato por Categoria" FontSize="15" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Tipo:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox ItemsSource="{Binding TiposFiltro}" SelectedItem="{Binding TipoFiltroSelecionado}" Width="150">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumTexto}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Lista do extrato -->
+            <ListBox Grid.Row="4" ItemsSource="{Binding ExtratoPorCategoria}" HorizontalContentAlignment="Stretch" MaxHeight="220">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Key}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat=C}" FontWeight="SemiBold"
                                    Foreground="{Binding Value, Converter={StaticResource ValorCor}}"/>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </ScrollViewer>
 </UserControl>
